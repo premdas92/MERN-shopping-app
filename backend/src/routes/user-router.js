@@ -1,9 +1,11 @@
 const express = require("express");
 const { getAllUsers, updateUser } = require("../controllers/user-controller");
+const { userAuth } = require("../middlewares/user-auth");
+const adminAuth = require("../middlewares/admin-auth");
 
 const userRouter = express.Router();
 
-userRouter.get("/", getAllUsers);
-userRouter.patch("/:id", updateUser);
+userRouter.get("/", userAuth, adminAuth, getAllUsers);
+userRouter.patch("/:id", userAuth, updateUser);
 
 module.exports = userRouter;

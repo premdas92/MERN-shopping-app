@@ -32,14 +32,21 @@ const createproduct = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const page = parseInt(req.query.page) || 1;
-  let limit = parseInt(req.query.limit) || 10;
-  limit = limit > 50 ? 50 : limit;
-  const skip = (page - 1) * limit;
   try {
-    const allProducts = await Products.find({}).limit(limit).skip(skip);
+    const allProducts = await Products.find({});
+    const grouped = {
+      vegetables: [],
+      fruits: [],
+    };
 
-    res.status(200).json({ data: allProducts });
+    allProducts.forEach((product) => {
+      const category = product.category.toLowerCase();
+      if (grouped[category]) {
+        grouped[category].push(product);
+      }
+    });
+
+    res.status(200).json({ data: grouped });
   } catch (err) {
     res.send(400).json({ error: err.message });
   }
@@ -47,9 +54,22 @@ const getAllProducts = async (req, res) => {
 
 const getAllProductsByCategory = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    let limit = parseInt(req.query.limit) || 10;
+    limit = limit > 50 ? 50 : limit;
+    const skip = (page - 1) * limit;
     const productCategory = req.params.category.toLowerCase();
-    const products = await Products.find({ category: productCategory });
-    res.status(200).json(products);
+    const products = await Products.find({ category: productCategory })
+      .limit(limit)
+      .skip(skip);
+    const total = await Products.countDocuments({ category: productCategory });
+    res.status(200).json({
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+      totalItems: total,
+      data: products,
+    });
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
@@ -81,7 +101,6 @@ const deleteProduct = async (req, res) => {
   try {
     const productId = req.params.id;
     const productToDelete = await Products.findByIdAndDelete(productId);
-    console.log(productToDelete)
     res.status(200).json(productToDelete);
   } catch (err) {
     res.status(400).json({ error: err.message });
