@@ -17,10 +17,11 @@
 - Admin - DELETE /api/products/:id -> Delete a product
 
 ## Cart Routes (With Auth)
-- GET /api/cart -> Get current user's cart
-- POST /api/cart -> Add to cart
-- PATCH /api/cart/:productId -> Update product qty in cart
-- DELETE /api/cart/:productId -> Remove from cart
+- GET /api/user/cart -> Get current user's cart
+- POST /api/user/cart -> Add to cart
+- PATCH /api/user/cart/:productId -> Update product qty in cart
+- DELETE /api/user/cart/:productId -> Remove from cart
+- DELETE /api/user/cart/clear -> Clear the cart
 
 ## Order Routes (With Auth)
 - POST /api/orders -> Place order from cart
