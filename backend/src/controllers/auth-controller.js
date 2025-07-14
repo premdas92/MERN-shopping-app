@@ -32,6 +32,7 @@ const login = async (req, res) => {
     }
     const accessToken = await user.generateAccessToken();
     const refreshToken = await user.generateRefreshToken();
+    const displayUser = await User.findOne({ email }).select("-password");
     res
       .status(200)
       .cookie("accessToken", accessToken, {
@@ -47,6 +48,7 @@ const login = async (req, res) => {
       })
       .json({
         message: "Logged in Successfully",
+        data: displayUser
       });
   } catch (err) {
     res.status(400).json({ error: err.message });

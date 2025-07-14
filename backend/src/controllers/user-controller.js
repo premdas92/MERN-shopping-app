@@ -9,6 +9,15 @@ const getAllUsers = async (req, res) => {
   }
 };
 
+const getCurrentUser = async (req, res) => {
+  try {
+    const currentUser = await User.findById(req.loggedInUser._id).select('-password -v');
+    res.json({data: currentUser});
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+
 const updateUser = async (req, res) => {
   try {
     const userId = req.params.id;
@@ -26,4 +35,4 @@ const updateUser = async (req, res) => {
   }
 };
 
-module.exports = { updateUser, getAllUsers };
+module.exports = { updateUser, getAllUsers, getCurrentUser };
