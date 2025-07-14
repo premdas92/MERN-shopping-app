@@ -5,9 +5,14 @@ const productRouter = require("./routes/product-router");
 const authRouter = require("./routes/auth-router");
 const userRouter = require("./routes/user-router");
 const cartRouter = require("./routes/cart-router");
+const cors = require("cors");
 
 const app = express();
 
+app.use(cors({
+  origin: "http://localhost:5173",
+  credentials: true
+}))
 app.use(express.json());
 app.use(cookieParser());
 
