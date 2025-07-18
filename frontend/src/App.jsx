@@ -11,6 +11,7 @@ import { getUserProfile } from "./slices/authSlice";
 import Header from "./components/Header";
 import ProductDetail from "./pages/ProductDetail";
 import MyProfile from "./pages/MyProfile";
+import SocketJoiner from "./socket/socket-joiner";
 
 function App() {
   const dispatch = useDispatch();
@@ -27,6 +28,7 @@ function App() {
             path="/products"
             element={
               <PrivateRoute>
+                <SocketJoiner />
                 <Header />
                 <Home />
               </PrivateRoute>
@@ -36,6 +38,7 @@ function App() {
             path="/products/:id"
             element={
               <PrivateRoute>
+                <SocketJoiner />
                 <Header />
                 <ProductDetail />
               </PrivateRoute>
@@ -43,6 +46,7 @@ function App() {
           />
           <Route path="/profile" element={
             <PrivateRoute>
+              <SocketJoiner />
               <Header />
               <MyProfile />
             </PrivateRoute>

@@ -1,4 +1,6 @@
 const express = require("express");
+const http = require("http");
+const { Server } = require("socket.io");
 const cookieParser = require("cookie-parser");
 const connectDB = require("./config/database");
 const productRouter = require("./routes/product-router");
@@ -9,10 +11,24 @@ const cors = require("cors");
 
 const app = express();
 
-app.use(cors({
-  origin: "http://localhost:5173",
-  credentials: true
-}))
+const server = http.createServer(app);
+
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173",
+    credentials: true,
+  },
+});
+
+require("./socket")(io);
+
+// Middlewares
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(cookieParser());
 
@@ -26,8 +42,9 @@ app.use("/api/user/cart", cartRouter);
 connectDB()
   .then(() => {
     console.log("Database connection established...");
-    app.listen(PORT, () => {
-      console.log("Server is successfully running on port 3000");
+    server.listen(PORT, () => {
+      // console.log("Server is successfully running on port 3000");
+      console.log(`Server running with WebSocket on port ${PORT}`);
     });
   })
   .catch((err) => {

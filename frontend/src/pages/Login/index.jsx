@@ -3,6 +3,7 @@ import PageCard from "../../components/PageCard";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser } from "../../slices/authSlice";
 import { useNavigate } from "react-router-dom";
+import socket from "../../socket/socket";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -14,8 +15,9 @@ const Login = () => {
   const [password, setPassword] = useState("");
 
   useEffect(() => {
-    if (user) {
+    if (user && user?._id) {
       navigate('/products');
+      socket.emit("join_room", user._id);
     }
   }, [user, navigate]);
 

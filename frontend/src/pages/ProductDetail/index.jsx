@@ -12,8 +12,6 @@ const ProductDetail = () => {
 
   const { productDetail } = useSelector((state) => state.products);
 
-  console.log(productDetail,'PDS', id);
-
   useEffect(() => {
     if (id) {
       dispatch(fetchProductById({ id }));

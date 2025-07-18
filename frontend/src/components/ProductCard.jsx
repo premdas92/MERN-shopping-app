@@ -1,24 +1,99 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import socket from "../socket/socket";
+import { useDispatch } from "react-redux";
+import { updateCart, fetchCart, addToCartThunk } from "../slices/cartSlice";
 
 const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(0);
   const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
+  const { cartItems } = useSelector((state) => state.cart);
 
-  const handleAdd = (e) => {
-    e.stopPropagation();
-    setQuantity(1);
+  useEffect(() => {
+    const handleCartUpdate = (updatedProduct) => {
+      if (updatedProduct._id === product._id) {
+        setQuantity(updatedProduct.quantity);
+      }
+    };
+    socket.on("cart_updated", handleCartUpdate);
+    return () => {
+      socket.off("cart_updated", handleCartUpdate);
+    };
+  }, [product._id]);
+
+  useEffect(() => {
+    if (user?._id) {
+      dispatch(fetchCart());
+    }
+  }, [dispatch, user]);
+
+  useEffect(() => {
+    const itemInCart = cartItems.find((item) => item.productId === product._id);
+    if (itemInCart) {
+      setQuantity(itemInCart.quantity);
+    } else {
+      setQuantity(0);
+    }
+  }, [cartItems, product._id]);
+
+  const updateInCartAPI = async (qty = 1) => {
+    try {
+      dispatch(updateCart({ productId: product._id, quantity: qty }));
+      // Emit socket event
+      if (user?._id) {
+        socket.emit("cart_updated", {
+          userId: user._id,
+          product: {
+            ...product,
+            quantity: qty,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Failed to add to cart", err);
+    }
   };
 
-  const increment = (e) => {
-    e.stopPropagation();
-    setQuantity((prev) => prev + 1);
+  const handleAdd = async (e) => {
+    try {
+      e.stopPropagation();
+      setQuantity(1);
+      dispatch(addToCartThunk({ productId: product._id, quantity: 1 }));
+      // Emit socket event
+      if (user?._id) {
+        socket.emit("cart_updated", {
+          userId: user._id,
+          product: {
+            ...product,
+            quantity: 1,
+          },
+        });
+      }
+    } catch (err) {
+      console.error("Failed to add to cart", err);
+    }
   };
 
-  const decrement = (e) => {
+  const increment = async (e) => {
     e.stopPropagation();
-    if (quantity === 1) return setQuantity(0);
-    setQuantity((prev) => prev - 1);
+    const newQty = quantity + 1;
+    setQuantity(newQty);
+    await updateInCartAPI(newQty);
+  };
+
+  const decrement = async (e) => {
+    e.stopPropagation();
+    if (quantity === 1) {
+      setQuantity(0);
+      await updateInCartAPI(0);
+      return;
+    }
+    const newQty = quantity - 1;
+    setQuantity(newQty);
+    await updateInCartAPI(newQty);
   };
   return (
     <div
