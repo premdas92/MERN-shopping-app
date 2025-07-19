@@ -58,11 +58,15 @@ const getAllProductsByCategory = async (req, res) => {
     let limit = parseInt(req.query.limit) || 10;
     limit = limit > 50 ? 50 : limit;
     const skip = (page - 1) * limit;
-    const productCategory = req.params.category.toLowerCase();
-    const products = await Products.find({ category: productCategory })
-      .limit(limit)
-      .skip(skip);
-    const total = await Products.countDocuments({ category: productCategory });
+
+    const rawCategory = req.params.category;
+    const isAll = !rawCategory || rawCategory.toLowerCase() === "all";
+
+    const query = isAll ? {} : { category: rawCategory.toLowerCase() };
+
+    const products = await Products.find(query).limit(limit).skip(skip);
+    const total = await Products.countDocuments(query);
+
     res.status(200).json({
       page,
       limit,

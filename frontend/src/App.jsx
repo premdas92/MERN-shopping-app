@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import ProductDetail from "./pages/ProductDetail";
 import MyProfile from "./pages/MyProfile";
 import SocketJoiner from "./socket/socket-joiner";
+import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -49,6 +50,13 @@ function App() {
               <SocketJoiner />
               <Header />
               <MyProfile />
+            </PrivateRoute>
+          } />
+          <Route path="/checkout" element={
+              <PrivateRoute>
+              <SocketJoiner />
+              <Header />
+              <CheckoutPage />
             </PrivateRoute>
           } />
           <Route path="*" element={<PageNotFound />} />

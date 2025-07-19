@@ -8,8 +8,6 @@ export const fetchProducts = async (category = "", page = 1, limit = 10) => {
 };
 
 export const getProductById = async (id) => {
-    console.log(id,'IDIDIDID')
   const response = await axios.get(`/products/${id}`);
-  console.log(response,'OO', id)
   return response?.data;
 };

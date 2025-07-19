@@ -122,7 +122,7 @@ const ProductCard = ({ product }) => {
             Add
           </button>
         ) : (
-          <div className="flex justify-between items-center gap-2">
+          <div className="flex justify-between items-center gap-2" onClick={(e) => e.stopPropagation()}>
             <button
               onClick={(e) => decrement(e)}
               className="bg-indigo-600 text-white w-8 h-8 rounded-full text-lg font-semibold hover:bg-indigo-700 cursor-pointer"

@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   addToCart,
+  clearCartApi,
   getCart,
   removeCartItem,
   updateCartItem,
@@ -25,7 +26,6 @@ export const addToCartThunk = createAsyncThunk(
   async ({ productId, quantity }, thunkAPI) => {
     try {
       const res = await addToCart({ productId, quantity });
-      console.log(res);
       return res;
     } catch (err) {
       return thunkAPI.rejectWithValue(
@@ -63,6 +63,20 @@ export const deleteCartItemThunk = createAsyncThunk(
   }
 );
 
+export const clearCartThunk = createAsyncThunk(
+  "cart/clearcart",
+  async (_, thunkAPI) => {
+    try {
+      const res = await clearCartApi();
+      return res;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err?.response?.data?.error || "Failed to clear the cart"
+      );
+    }
+  }
+);
+
 const cartSlice = createSlice({
   name: "cart",
   initialState: {
@@ -72,7 +86,10 @@ const cartSlice = createSlice({
   },
   reducers: {
     updateItemFromSocket: (state, action) => {
-      const item = action.payload;
+      const item = {
+        ...action.payload,
+        productId: action.payload.productId || action.payload._id,
+      };
       const index = state.cartItems.findIndex(
         (i) => i.productId === item.productId
       );

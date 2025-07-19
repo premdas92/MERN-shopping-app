@@ -1,13 +1,19 @@
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import socket from "../socket/socket";
-import { deleteCartItemThunk, fetchCart, updateCart, updateItemFromSocket } from "../slices/cartSlice";
+import {
+  deleteCartItemThunk,
+  fetchCart,
+  updateCart,
+} from "../slices/cartSlice";
+import { useNavigate } from "react-router-dom";
 
 const CartDrawer = ({ isOpen, onClose }) => {
   const dispatch = useDispatch();
   const { cartItems: reduxCartItems } = useSelector((state) => state.cart);
   const { user } = useSelector((state) => state.auth);
   const [localCartItems, setLocalCartItems] = useState([]);
+  const navigate = useNavigate();
 
   // 1. Join socket room once
   useEffect(() => {
@@ -34,69 +40,97 @@ const CartDrawer = ({ isOpen, onClose }) => {
   // 4. Listen for cart updates via socket
   useEffect(() => {
     const handleCartUpdate = (product) => {
-      dispatch(updateItemFromSocket(product));
+      setLocalCartItems((prev) => {
+        const index = prev.findIndex((item) => item.productId === product._id);
+        if (product.quantity === 0) {
+          return prev.filter((item) => item.productId !== product._id);
+        }
+        if (index !== -1) {
+          const updated = [...prev];
+          updated[index].quantity = product.quantity;
+          return updated;
+        } else {
+          return [
+            ...prev,
+            {
+              productId: product._id,
+              name: product.name,
+              image: product.image,
+              price: product.price,
+              quantity: product.quantity,
+            },
+          ];
+        }
+      });
     };
 
     socket.on("cart_updated", handleCartUpdate);
     return () => {
       socket.off("cart_updated", handleCartUpdate);
     };
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   const handleQuantityChange = (productId, delta) => {
-  const item = localCartItems.find((i) => i.productId === productId);
-  if (!item) return;
+    const item = localCartItems.find((i) => i.productId === productId);
+    if (!item) return;
 
-  const newQty = item.quantity + delta;
+    const newQty = item.quantity + delta;
 
-  // 1. If new quantity is 0 → remove item
-  if (newQty <= 0) {
+    // 1. If new quantity is 0 → remove item
+    if (newQty <= 0) {
+      setLocalCartItems((prev) =>
+        prev.filter((i) => {
+          return i.productId !== productId;
+        })
+      );
+
+      if (user?._id) {
+        socket.emit("cart_updated", {
+          userId: user._id,
+          product: {
+            ...item,
+            _id: item.productId,
+            quantity: 0,
+          },
+        });
+      }
+      dispatch(
+        deleteCartItemThunk({
+          productId: productId,
+        })
+      );
+      return;
+    }
+
+    // 2. Else → update item
+    const updatedItem = { ...item, quantity: newQty };
+
     setLocalCartItems((prev) =>
-      prev.filter((i) => i.productId !== productId)
+      prev.map((i) => (i.productId === productId ? updatedItem : i))
     );
 
     if (user?._id) {
       socket.emit("cart_updated", {
         userId: user._id,
         product: {
-          ...item,
-          _id: item.productId,
-          quantity: 0,
+          ...updatedItem,
+          _id: updatedItem.productId,
         },
       });
     }
-    dispatch(deleteCartItemThunk({
-    productId: productId,
-  }));
-    return;
-  }
 
-  // 2. Else → update item
-  const updatedItem = { ...item, quantity: newQty };
-
-  setLocalCartItems((prev) =>
-    prev.map((i) => (i.productId === productId ? updatedItem : i))
-  );
-
-  if (user?._id) {
-    socket.emit("cart_updated", {
-      userId: user._id,
-      product: {
-        ...updatedItem,
-        _id: updatedItem.productId,
-      },
-    });
-  }
-
-  dispatch(updateCart({
-    productId: updatedItem.productId,
-    quantity: updatedItem.quantity,
-  }));
-};
-
+    dispatch(
+      updateCart({
+        productId: updatedItem.productId,
+        quantity: updatedItem.quantity,
+      })
+    );
+  };
 
   const handleRemove = (productId) => {
-    setLocalCartItems((prev) => prev.filter((item) => item.productId !== productId));
+    setLocalCartItems((prev) =>
+      prev.filter((item) => item.productId !== productId)
+    );
 
     const item = localCartItems.find((i) => i.productId === productId);
     if (user?._id && item) {
@@ -109,12 +143,22 @@ const CartDrawer = ({ isOpen, onClose }) => {
         },
       });
     }
+    dispatch(
+      deleteCartItemThunk({
+        productId: productId,
+      })
+    );
   };
 
   const total = localCartItems.reduce(
     (acc, item) => acc + item.price * item.quantity,
     0
   );
+
+  const navigateToCheckout = () => {
+    onClose();
+    navigate("/checkout");
+  };
 
   return (
     <>
@@ -168,7 +212,7 @@ const CartDrawer = ({ isOpen, onClose }) => {
                     </button>
                     <button
                       onClick={() => handleRemove(item.productId)}
-                      className="ml-auto text-red-500 hover:text-red-700 text-sm"
+                      className="ml-auto text-red-500 hover:text-red-700 text-sm cursor-pointer"
                     >
                       🗑️
                     </button>
@@ -178,16 +222,15 @@ const CartDrawer = ({ isOpen, onClose }) => {
             ))
           )}
         </div>
-
-        {/* Footer */}
         <div className="p-4 border-t bg-gray-50">
           <div className="flex justify-between font-medium">
             <span>Total</span>
             <span>₹{total}</span>
           </div>
           <button
-            className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded"
+            className="w-full mt-4 bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded cursor-pointer"
             disabled={localCartItems.length === 0}
+            onClick={navigateToCheckout}
           >
             Checkout
           </button>

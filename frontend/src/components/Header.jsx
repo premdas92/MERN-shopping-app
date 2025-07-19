@@ -44,7 +44,7 @@ const Header = () => {
 
   const hideSearch =
     location.pathname.startsWith("/products/") ||
-    location.pathname === "/profile";
+    location.pathname === "/profile" || location.pathname === "/checkout";
 
   const handleLogOut = async () => {
     const result = await dispatch(logoutUser());
@@ -93,7 +93,7 @@ const Header = () => {
       {cartOpen && (
         <div
           className="fixed inset-0 bg-black/70 bg-opacity-50 z-40"
-          onClick={() => setCartOpen(false)} // optional: close on clicking backdrop
+          onClick={() => setCartOpen(false)}
         />
       )}
       <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />

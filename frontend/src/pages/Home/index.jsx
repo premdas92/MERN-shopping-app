@@ -3,12 +3,13 @@ import { getProducts } from "../../slices/productSlice";
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import ProductList from "../../components/ProductList";
+import { productCategories } from "../../constants/product-categories";
 
 const Home = () => {
-  const [selectedCategory, setSelectCategory] = useState("Fruits");
+  const [selectedCategory, setSelectCategory] = useState(productCategories[0].name);
 
   const dispatch = useDispatch();
-//   const { user } = useSelector((state) => state.auth);
+  //   const { user } = useSelector((state) => state.auth);
   const {
     data: products,
     loading,
@@ -30,34 +31,22 @@ const Home = () => {
               Categories
             </h2>
             <ul className="space-y-2">
-              <li
-                className={`cursor-pointer text-gray-700 hover:text-indigo-600 hover:bg-[#9869d680] flex gap-4 items-center ${
-                  selectedCategory === "Fruits" ? "bg-[#9869d680]" : ""
-                }`}
-                onClick={() => setSelectCategory("Fruits")}
-              >
-                <span className="inline-block h-12 w-12 rounded-full bg-[#F7F0FA]">
-                  <img
-                    src="https://cdn.zeptonow.com/production/tr:w-90,ar-160-161,pr-true,f-auto,q-80/cms/sub_category/7e51d0f6-ee57-42f3-98f9-945033ad3e5f.png"
-                    alt="category-img"
-                  />
-                </span>
-                <p> Fruits</p>
-              </li>
-              <li
-                className={`cursor-pointer text-gray-700 hover:text-indigo-600 hover:bg-[#9869d680] flex gap-4 items-center ${
-                  selectedCategory === "Vegetables" ? "bg-[#9869d680]" : ""
-                }`}
-                onClick={() => setSelectCategory("Vegetables")}
-              >
-                <span className="inline-block h-12 w-12 rounded-full bg-[#F7F0FA]">
-                  <img
-                    src="https://cdn.zeptonow.com/production/tr:w-90,ar-160-161,pr-true,f-auto,q-80/cms/sub_category/694c07e0-542b-49db-a596-b1f4f4935342.png"
-                    alt="category-img"
-                  />
-                </span>
-                <p> Vegetables</p>
-              </li>
+              {productCategories.map((data, index) => {
+                return (
+                  <li
+                    key={`${data.name}.${index}`}
+                    className={`cursor-pointer text-gray-700 hover:text-indigo-600 hover:bg-[#9869d680] flex gap-4 items-center ${
+                      selectedCategory === data.name ? "bg-[#9869d680]" : ""
+                    }`}
+                    onClick={() => setSelectCategory(data.name)}
+                  >
+                    <span className="inline-block h-12 w-12 rounded-full bg-[#F7F0FA]">
+                      <img src={data.img} alt="category-img" />
+                    </span>
+                    <p>{data.name}</p>
+                  </li>
+                );
+              })}
             </ul>
           </aside>
 
