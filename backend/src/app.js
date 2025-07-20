@@ -8,6 +8,7 @@ const authRouter = require("./routes/auth-router");
 const userRouter = require("./routes/user-router");
 const cartRouter = require("./routes/cart-router");
 const cors = require("cors");
+const orderRouter = require("./routes/order-router");
 
 const app = express();
 
@@ -38,6 +39,7 @@ app.use("/api/auth", authRouter);
 app.use("/api/products", productRouter);
 app.use("/api/user", userRouter);
 app.use("/api/user/cart", cartRouter);
+app.use("/api/user/orders", orderRouter)
 
 connectDB()
   .then(() => {

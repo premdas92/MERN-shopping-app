@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { clearCartThunk } from "../../slices/cartSlice";
+import { placeOrderThunk } from "../../slices/orderSlice";
 
 const Checkout = () => {
   const { cartItems } = useSelector((state) => state.cart);
@@ -19,6 +20,22 @@ const Checkout = () => {
     0
   );
 
+const orderPayload = {
+  cartItems: cartItems.map((item) => ({
+    productId: item.productId,
+    name: item.name,
+    image: item.image,
+    price: item.price,
+    quantity: item.quantity,
+  })),
+  shippingDetails: {
+    name: formData.name,
+    address: formData.address,
+    phone: formData.phone,
+  },
+  totalAmount: total,
+};
+
  // Redirect to /products if cart is empty
   useEffect(() => {
     if (cartItems.length === 0) {
@@ -31,6 +48,7 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = () => {
+    dispatch(placeOrderThunk(orderPayload));
     cartItems.forEach((item) => {
       dispatch(clearCartThunk({ productId: item.productId }));
     });
@@ -50,6 +68,7 @@ const Checkout = () => {
             ✅ Order Placed Successfully!
           </h1>
           <p className="text-gray-600 text-lg">Thanks for shopping with us 🎉</p>
+          <p className="text-gray-700 text-lg">Redirecting to products page...</p>
         </div>
       </div>
     );

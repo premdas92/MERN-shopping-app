@@ -1,5 +1,19 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchUser, login, logout } from "../api/authApi";
+import { fetchUser, login, logout, signup } from "../api/authApi";
+
+export const signupuserThunk = createAsyncThunk(
+  "auth/registerUser",
+  async ({ name, email, password }, thunkAPI) => {
+    try {
+      const response = await signup({ name, email, password });
+      return response?.data;
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        err.response?.data?.error || "Signup failed"
+      );
+    }
+  }
+);
 
 export const loginUser = createAsyncThunk(
   "auth/loginUser",
@@ -92,6 +106,19 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.error = action.payload;
+      })
+      // SIGNUP
+      .addCase(signupuserThunk.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(signupuserThunk.fulfilled, (state, action) => {
+        state.loading = false;
+        state.user = action.payload;
+      })
+      .addCase(signupuserThunk.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload; // error message
       });
   },
 });

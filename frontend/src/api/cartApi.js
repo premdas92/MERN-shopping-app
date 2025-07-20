@@ -34,6 +34,5 @@ export const clearCartApi = async() => {
   const res = await axios.delete('user/cart/clear',{
     withCredentials: true
   });
-  console.log(res,'RES!')
   return res.cart;
 }

@@ -4,8 +4,11 @@ const jwt = require("jsonwebtoken");
 
 const signup = async (req, res) => {
   try {
-    const { name, email, password, cart, orders } = req.body;
-
+    const { name, email, password } = req.body;
+    const isUserExists = await User.findOne({ email });
+    if (isUserExists) {
+      return res.status(400).json({ error: "Email already registered." });
+    }
     const passwordHash = await bcrypt.hash(password, 10);
     const user = new User({
       name,
@@ -15,7 +18,7 @@ const signup = async (req, res) => {
     user.save();
     res.status(201).json({ message: "User created", data: user });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -48,10 +51,10 @@ const login = async (req, res) => {
       })
       .json({
         message: "Logged in Successfully",
-        data: displayUser
+        data: displayUser,
       });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(401).json({ error: err.message });
   }
 };
 
@@ -73,7 +76,7 @@ const logout = async (req, res) => {
     res.clearCookie("accessToken");
     res.status(200).json({ message: "Logged out" });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 

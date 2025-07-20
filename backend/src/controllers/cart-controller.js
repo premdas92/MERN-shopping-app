@@ -19,7 +19,7 @@ const getUserCart = async (req, res) => {
     }));
     res.status(200).json({ cart: cartItems });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -77,7 +77,7 @@ const addToCart = async (req, res) => {
       .status(200)
       .json({ message: "Product added to cart", cart: enrichedCart });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -101,7 +101,7 @@ const removeFromcart = async (req, res) => {
       .status(200)
       .json({ message: "Item removed from cart", cart: user.cart });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 
@@ -152,7 +152,7 @@ const updateCartItem = async (req, res) => {
 
     return res.status(200).json({ message: "Cart updated", cart: updatedCart });
   } catch (err) {
-    return res.status(400).json({ error: err.message });
+    return res.status(500).json({ error: err.message });
   }
 };
 
@@ -164,7 +164,7 @@ const clearCart = async (req, res) => {
     user.save();
     res.status(200).json({ cart: user.cart });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(500).json({ error: err.message });
   }
 };
 

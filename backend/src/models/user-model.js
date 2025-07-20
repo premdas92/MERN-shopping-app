@@ -1,43 +1,47 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
 const jwt = require("jsonwebtoken");
+const orderSchema = require("./order-schema");
 
 const { Schema } = mongoose;
 
-const userSchema = new Schema({
-  name: { type: String, required: true, minLength: 3, maxLength: 50 },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-    lowercase: true,
-    match: [/.+@.+\..+/, "Please enter a valid email"],
-  },
-  password: {
-    type: String,
-    required: true,
-    validate(value) {
-      if (!validator.isStrongPassword(value)) {
-        throw new Error("Enter a Strong Password " + value);
-      }
+const userSchema = new Schema(
+  {
+    name: { type: String, required: true, minLength: 3, maxLength: 50 },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      trim: true,
+      lowercase: true,
+      match: [/.+@.+\..+/, "Please enter a valid email"],
     },
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
-  cart: {
-    type: [
-      {
-        productId: { type: mongoose.Schema.Types.ObjectId, ref: "Products" },
-        quantity: { type: Number, min: 1 },
+    password: {
+      type: String,
+      required: true,
+      validate(value) {
+        if (!validator.isStrongPassword(value)) {
+          throw new Error("Enter a Strong Password " + value);
+        }
       },
-    ],
-    default: [],
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    cart: {
+      type: [
+        {
+          productId: { type: mongoose.Schema.Types.ObjectId, ref: "Products" },
+          quantity: { type: Number, min: 1 },
+        },
+      ],
+      default: [],
+    },
+    orders: [orderSchema],
   },
-  orders: [],
-});
+  { versionKey: false }
+);
 
 userSchema.methods.generateRefreshToken = async function () {
   const user = this;
