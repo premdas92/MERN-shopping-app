@@ -5,9 +5,6 @@ import PageNotFound from "./pages/PageNotFound";
 import SignUp from "./pages/SignUp";
 import Home from "./pages/Home";
 import PrivateRoute from "./components/PrivateRoute";
-import { useDispatch } from "react-redux";
-import { useEffect } from "react";
-import { getUserProfile } from "./slices/authSlice";
 import Header from "./components/Header";
 import ProductDetail from "./pages/ProductDetail";
 import MyProfile from "./pages/MyProfile";
@@ -15,10 +12,6 @@ import SocketJoiner from "./socket/socket-joiner";
 import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
-  const dispatch = useDispatch();
-  useEffect(() => {
-    dispatch(getUserProfile());
-  }, [dispatch]);
   return (
     <div className="min-h-screen bg-gray-100">
       <BrowserRouter>

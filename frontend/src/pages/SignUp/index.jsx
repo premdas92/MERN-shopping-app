@@ -1,9 +1,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
-// import { signupThunk } from "../../slices/authSlice";
 import { useNavigate } from "react-router-dom";
 import { signupuserThunk } from "../../slices/authSlice";
-import { useSelector } from "react-redux";
 
 const Signup = () => {
   const [formData, setFormData] = useState({
@@ -11,11 +9,10 @@ const Signup = () => {
     email: "",
     password: "",
   });
-
   const [errors, setErrors] = useState({});
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { error } = useSelector((state) => state.auth);
 
   const validate = () => {
     const newErrors = {};
@@ -57,9 +54,15 @@ const Signup = () => {
     e.preventDefault();
     if (!validate()) return;
 
-    dispatch(signupuserThunk(formData));
-
-    error ? alert(error) : navigate("/");
+    const res = await dispatch(signupuserThunk(formData));
+    if (res?.error) {
+      alert(res?.payload);
+    } else {
+      alert("User registered successfully. Redirecting to login");
+      setTimeout(() => {
+        navigate("/");
+      }, 1000);
+    }
   };
 
   return (

@@ -59,6 +59,7 @@ export const getUserProfile = createAsyncThunk(
 
 const initialState = {
   user: null,
+  signedUpUser: null,
   loading: false,
   error: null,
   profileLoaded: false,
@@ -114,14 +115,13 @@ const authSlice = createSlice({
       })
       .addCase(signupuserThunk.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.signedUpUser = action.payload;
       })
       .addCase(signupuserThunk.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload; // error message
+        state.error = action.payload;
       });
   },
 });
 
-// export const { logout } = authSlice.actions;
 export default authSlice.reducer;

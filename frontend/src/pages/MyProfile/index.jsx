@@ -107,7 +107,7 @@ const MyProfile = () => {
             ) : (
               <>
                 <h2 className="text-xl font-semibold mb-4">Your Orders</h2>
-                {userOrders?.map((order) => (
+                {userOrders.length > 0 ? userOrders?.map((order) => (
                   <div
                     key={order._id}
                     onClick={() => setSelectedOrder(order)}
@@ -141,7 +141,7 @@ const MyProfile = () => {
                       </p>
                     </div>
                   </div>
-                ))}
+                )) : <h1>No orders to show</h1>}
               </>
             )}
           </div>
