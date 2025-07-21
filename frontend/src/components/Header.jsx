@@ -1,19 +1,20 @@
 import { FaUserCircle, FaShoppingCart, FaSignOutAlt } from "react-icons/fa";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch, useSelector, shallowEqual } from "react-redux";
 import { logoutUser } from "../slices/authSlice";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import CartDrawer from "./CartDrawer";
 import { fetchCart } from "../slices/cartSlice";
-import socket from "../socket/socket"; // Make sure this is shared instance
+import socket from "../socket/socket";
+import debounce from "../utility/utility";
 
 const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
-  const { cartItems } = useSelector((state) => state.cart);
-  const { user } = useSelector((state) => state.auth);
+  const { cartItems } = useSelector((state) => state.cart, shallowEqual);
+  const { user } = useSelector((state) => state.auth, shallowEqual);
 
   // Initial cart fetch on mount
   useEffect(() => {
@@ -22,15 +23,15 @@ const Header = () => {
     }
   }, [dispatch, user]);
 
-  // 🔁 Real-time sync with WebSocket
+  // Real-time sync with WebSocket
   useEffect(() => {
     if (!user?._id) return;
 
-    const handleCartSocketUpdate = (data) => {
+    const handleCartSocketUpdate = debounce((data) => {
       if (data?.userId === user._id) {
         dispatch(fetchCart());
       }
-    };
+    }, 300);
 
     socket.on("cart_updated", handleCartSocketUpdate);
 
@@ -39,12 +40,14 @@ const Header = () => {
     };
   }, [dispatch, user]);
 
-  // 🧮 Derived cart count from Redux state
-  const cartCount = cartItems?.reduce((sum, item) => sum + item.quantity, 0);
+  const cartCount = useMemo(() => {
+    return cartItems?.reduce((sum, item) => sum + item.quantity, 0);
+  }, [cartItems]);
 
   const hideSearch =
     location.pathname.startsWith("/products/") ||
-    location.pathname === "/profile" || location.pathname === "/checkout";
+    location.pathname === "/profile" ||
+    location.pathname === "/checkout";
 
   const handleLogOut = async () => {
     const result = await dispatch(logoutUser());
@@ -52,7 +55,7 @@ const Header = () => {
       navigate("/");
     }
   };
-
+  console.log(cartItems, "cartItems");
   return (
     <>
       <header className="w-full bg-white shadow-md p-6 flex items-center justify-between">
@@ -70,24 +73,32 @@ const Header = () => {
           )}
         </div>
 
-        <div className="flex items-center space-x-6 text-gray-600 text-2xl">
-          <a href="/profile">
-            <FaUserCircle className="hover:text-indigo-600 cursor-pointer" />
-          </a>
-          <a
-            onClick={() => setCartOpen(true)}
-            className="relative cursor-pointer"
-          >
-            <FaShoppingCart className="hover:text-indigo-600" />
-            {cartCount > 0 && (
-              <span className="absolute -top-3 -right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
-                {cartCount}
-              </span>
-            )}
-          </a>
-          <a onClick={handleLogOut}>
-            <FaSignOutAlt className="hover:text-indigo-600 cursor-pointer" />
-          </a>
+        <div className="flex gap-[15px]">
+          <div className="flex items-center gap-1 text-lg font-medium text-gray-800">
+            <span>Welcome,</span>
+            <span className="text-indigo-600 font-semibold">{user?.name}</span>
+          </div>
+
+          <div className="flex items-center space-x-6 text-gray-600 text-2xl">
+            <a onClick={() => navigate("/profile")} title="Profile">
+              <FaUserCircle className="hover:text-indigo-600 cursor-pointer" />
+            </a>
+            <a
+              title="Cart"
+              onClick={() => setCartOpen(true)}
+              className="relative cursor-pointer"
+            >
+              <FaShoppingCart className="hover:text-indigo-600" />
+              {cartCount > 0 && (
+                <span className="absolute -top-3 -right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                  {cartCount}
+                </span>
+              )}
+            </a>
+            <a onClick={handleLogOut} title="Logout">
+              <FaSignOutAlt className="hover:text-indigo-600 cursor-pointer" />
+            </a>
+          </div>
         </div>
       </header>
       {cartOpen && (
@@ -101,4 +112,4 @@ const Header = () => {
   );
 };
 
-export default Header;
+export default React.memo(Header);

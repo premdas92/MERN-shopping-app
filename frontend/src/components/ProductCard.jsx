@@ -1,16 +1,17 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import socket from "../socket/socket";
 import { useDispatch } from "react-redux";
-import { updateCart, fetchCart, addToCartThunk } from "../slices/cartSlice";
+import { updateCart, addToCartThunk } from "../slices/cartSlice";
+import { shallowEqual } from "react-redux";
 
 const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(0);
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  const { user } = useSelector((state) => state.auth, shallowEqual);
   const dispatch = useDispatch();
-  const { cartItems } = useSelector((state) => state.cart);
+  const { cartItems } = useSelector((state) => state.cart, shallowEqual);
 
   useEffect(() => {
     const handleCartUpdate = (updatedProduct) => {
@@ -23,12 +24,6 @@ const ProductCard = ({ product }) => {
       socket.off("cart_updated", handleCartUpdate);
     };
   }, [product._id]);
-
-  useEffect(() => {
-    if (user?._id) {
-      dispatch(fetchCart());
-    }
-  }, [dispatch, user]);
 
   useEffect(() => {
     const itemInCart = cartItems.find((item) => item.productId === product._id);
@@ -145,4 +140,4 @@ const ProductCard = ({ product }) => {
   );
 };
 
-export default ProductCard;
+export default React.memo(ProductCard);

@@ -11,10 +11,20 @@ const getAllUsers = async (req, res) => {
 
 const getCurrentUser = async (req, res) => {
   try {
-    const currentUser = await User.findById(req.loggedInUser._id).select('-password -v');
-    res.json({data: currentUser});
+    const user = await User.findById(req.loggedInUser._id).select("-password");
+    if (!user) {
+      return res.status(404).json({ error: "User not found" });
+    }
+    const sortedOrders = [...user.orders].sort(
+      (a, b) => new Date(b.placedAt) - new Date(a.placedAt)
+    );
+    const userWithSortedOrders = {
+      ...user.toObject(),
+      orders: sortedOrders,
+    };
+    res.status(200).json({ data: userWithSortedOrders });
   } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(401).json({ error: "Invalid session" });
   }
 };
 

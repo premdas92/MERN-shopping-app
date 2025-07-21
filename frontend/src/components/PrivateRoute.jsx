@@ -1,12 +1,15 @@
 import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
-const PrivateRoute = ({children}) => {
-  const { user, loading  } = useSelector((state) => state.auth);
+const PrivateRoute = ({ children }) => {
+  const { user, profileLoaded } = useSelector((state) => state.auth);
 
-  if (loading) return <p>Loading...</p>;
+  // Wait for session check
+  if (!profileLoaded) return <p>Checking session...</p>;
 
+  // Once loaded, redirect if not logged in
   if (!user) return <Navigate to="/" replace />;
+
   return children;
 };
 

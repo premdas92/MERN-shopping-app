@@ -1,59 +1,81 @@
 import "./App.css";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Login from "./pages/Login";
-import PageNotFound from "./pages/PageNotFound";
-import SignUp from "./pages/SignUp";
-import Home from "./pages/Home";
 import PrivateRoute from "./components/PrivateRoute";
-import Header from "./components/Header";
-import ProductDetail from "./pages/ProductDetail";
-import MyProfile from "./pages/MyProfile";
 import SocketJoiner from "./socket/socket-joiner";
-import CheckoutPage from "./pages/CheckoutPage";
+import { useDispatch } from "react-redux";
+import { Suspense, lazy, useEffect } from "react";
+import { getUserProfile } from "./slices/authSlice";
+import { useSelector } from "react-redux";
 
 function App() {
+  const dispatch = useDispatch();
+  const { profileLoaded, user } = useSelector((state) => state.auth);
+
+  const Login = lazy(() => import("./pages/Login"));
+  const SignUp = lazy(() => import("./pages/SignUp"));
+  const Home = lazy(() => import("./pages/Home"));
+  const ProductDetail = lazy(() => import("./pages/ProductDetail"));
+  const MyProfile = lazy(() => import("./pages/MyProfile"));
+  const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
+  const PageNotFound = lazy(() => import("./pages/PageNotFound"));
+  const Header = lazy(() => import("./components/Header"));
+
+  useEffect(() => {
+    if (!profileLoaded && !user) {
+      dispatch(getUserProfile());
+    }
+  }, [dispatch, profileLoaded, user]);
   return (
     <div className="min-h-screen bg-gray-100">
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route
-            path="/products"
-            element={
-              <PrivateRoute>
-                <SocketJoiner />
-                <Header />
-                <Home />
-              </PrivateRoute>
-            }
-          />
-           <Route
-            path="/products/:id"
-            element={
-              <PrivateRoute>
-                <SocketJoiner />
-                <Header />
-                <ProductDetail />
-              </PrivateRoute>
-            }
-          />
-          <Route path="/profile" element={
-            <PrivateRoute>
-              <SocketJoiner />
-              <Header />
-              <MyProfile />
-            </PrivateRoute>
-          } />
-          <Route path="/checkout" element={
-              <PrivateRoute>
-              <SocketJoiner />
-              <Header />
-              <CheckoutPage />
-            </PrivateRoute>
-          } />
-          <Route path="*" element={<PageNotFound />} />
-        </Routes>
+        <Suspense fallback={<div className="p-4">Loading...</div>}>
+          <Header />
+          <Routes>
+            <Route path="/" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route
+              path="/products"
+              element={
+                <PrivateRoute>
+                  <SocketJoiner />
+                  {/* <Header /> */}
+                  <Home />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/products/:id"
+              element={
+                <PrivateRoute>
+                  <SocketJoiner />
+                  {/* <Header /> */}
+                  <ProductDetail />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <PrivateRoute>
+                  <SocketJoiner />
+                  {/* <Header /> */}
+                  <MyProfile />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <PrivateRoute>
+                  <SocketJoiner />
+                  {/* <Header /> */}
+                  <CheckoutPage />
+                </PrivateRoute>
+              }
+            />
+            <Route path="*" element={<PageNotFound />} />
+          </Routes>
+        </Suspense>
       </BrowserRouter>
     </div>
   );

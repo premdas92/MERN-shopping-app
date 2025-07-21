@@ -12,20 +12,18 @@ const Home = () => {
   //   const { user } = useSelector((state) => state.auth);
   const {
     data: products,
-    loading,
-    error,
+    loading
   } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(getProducts({ category: selectedCategory }));
+    // dispatch(getProducts("fruits"))
   }, [dispatch, selectedCategory]);
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col">
-      {/* Main content container */}
       <div className="flex-1 flex justify-center px-4">
         <div className="flex w-full max-w-[1400px] gap-6 py-6">
-          {/* Left Sidebar */}
           <aside className="w-64 bg-white shadow-md p-4">
             <h2 className="text-2xl font-bold text-indigo-800 mb-4">
               Categories
@@ -50,13 +48,11 @@ const Home = () => {
             </ul>
           </aside>
 
-          {/* Products Section */}
           <main className="flex-1 overflow-y-auto">
             <h1 className="text-2xl font-bold text-indigo-800 mb-4">
               Products
             </h1>
             {loading && <p>Loading products...</p>}
-            {error && <p className="text-red-600">{error}</p>}
             <ProductList products={products} />
           </main>
         </div>

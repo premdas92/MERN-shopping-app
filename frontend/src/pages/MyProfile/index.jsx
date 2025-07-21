@@ -2,22 +2,35 @@ import { useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import moment from "moment";
+// import { useDispatch } from "react-redux";
+// import { getUserProfile } from "../../slices/authSlice";
 
 const MyProfile = () => {
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [userOrders, setUserOrders] = useState([]);
-  const { user } = useSelector((state) => state.auth);
+
+  const { user, profileLoading } = useSelector((state) => state.auth);
+  // const dispatch = useDispatch();
 
   const navigate = useNavigate();
 
-  useEffect(() => {
-    setUserOrders(user?.orders);
+// useEffect(() => {
+//   dispatch(getUserProfile());
+// }, [dispatch]);
+
+ useEffect(() => {
+    if (user?.orders) {
+      setUserOrders(user.orders);
+    }
   }, [user]);
+
+    if (profileLoading) return <p>Loading profile...</p>;
+
 
   return (
     <div className="min-h-screen bg-gray-100 py-6">
       <div className="max-w-6xl mx-auto flex bg-white rounded-lg shadow-md overflow-hidden">
-        {/* LEFT PANEL */}
+
         <div className="w-1/4 bg-indigo-50 p-6 border-r border-gray-200">
           <div className="text-center mb-6">
             <img
@@ -44,12 +57,12 @@ const MyProfile = () => {
           </nav>
         </div>
 
-        {/* RIGHT PANEL */}
+  
         <div className="w-full">
           {!selectedOrder && (
             <button
               onClick={() => navigate("/products")}
-              className="text-sm text-indigo-600 hover:underline mb-4 pt-[20px] pl-[20px]"
+              className="text-sm text-indigo-600 hover:underline mb-4 pt-[20px] pl-[20px] cursor-pointer"
             >
               ← Back to Homepage
             </button>
@@ -59,7 +72,7 @@ const MyProfile = () => {
               <div>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="text-sm text-indigo-600 hover:underline mb-4"
+                  className="text-sm text-indigo-600 hover:underline mb-4 cursor-pointer"
                 >
                   ← Back to Orders
                 </button>
@@ -68,9 +81,11 @@ const MyProfile = () => {
                 </h2>
                 <p className="text-sm text-gray-500 mb-2">
                   Placed on:{" "}
-                  {moment(selectedOrder.placedAt).format(
-                    "Do MMMM YYYY, h:mm A"
-                  )}
+                  <span className="font-bold">
+                    {moment(selectedOrder.placedAt).format(
+                      "Do MMMM YYYY, h:mm A"
+                    )}
+                  </span>
                 </p>
                 {/* <p className="text-sm text-gray-500 mb-2">
                   Delivered on: {selectedOrder.deliveredOn}
@@ -107,41 +122,49 @@ const MyProfile = () => {
             ) : (
               <>
                 <h2 className="text-xl font-semibold mb-4">Your Orders</h2>
-                {userOrders.length > 0 ? userOrders?.map((order) => (
-                  <div
-                    key={order._id}
-                    onClick={() => setSelectedOrder(order)}
-                    className="bg-gray-50 hover:bg-indigo-50 transition cursor-pointer rounded-lg p-4 mb-4 shadow-sm flex items-center justify-between"
-                  >
-                    <div className="flex items-center space-x-3">
-                      {order.items.slice(0, 3).map((item) => (
-                        <img
-                          key={item._id}
-                          src={item.image}
-                          alt={item.name}
-                          className="w-12 h-12 rounded object-cover"
-                        />
-                      ))}
-                      {order.items.length > 3 && (
-                        <span>+ {order.items.length - 3} more items</span>
-                      )}
-                    </div>
-                    <div className="flex-1 px-4">
-                      {/* <p className="text-sm font-semibold text-gray-700">
+                {userOrders.length > 0 ? (
+                  userOrders?.map((order) => (
+                    <div
+                      key={order._id}
+                      onClick={() => setSelectedOrder(order)}
+                      className="bg-gray-50 hover:bg-indigo-50 transition cursor-pointer rounded-lg p-4 mb-4 shadow-sm flex items-center justify-between"
+                    >
+                      <div className="flex items-center space-x-3">
+                        {order.items.slice(0, 3).map((item) => (
+                          <img
+                            key={item._id}
+                            src={item.image}
+                            alt={item.name}
+                            className="w-12 h-12 rounded object-cover"
+                          />
+                        ))}
+                        {order.items.length > 3 && (
+                          <span>+ {order.items.length - 3} more items</span>
+                        )}
+                      </div>
+                      <div className="flex-1 px-4">
+                        {/* <p className="text-sm font-semibold text-gray-700">
                         Order {order.status === "delivered" && "delivered ✅"}
                       </p> */}
-                      <p className="text-xs text-gray-500">
-                        Placed on{" "}
-                        {moment(order.placedAt).format("Do MMMM YYYY, h:mm A")}
-                      </p>
+                        <p className="text-xs text-gray-500">
+                          <span className="font-bold">
+                            Placed on:{" "}
+                            {moment(order.placedAt).format(
+                              "Do MMMM YYYY, h:mm A"
+                            )}
+                          </span>
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-md font-semibold text-gray-800">
+                          ₹{order.totalAmount}
+                        </p>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="text-md font-semibold text-gray-800">
-                        ₹{order.totalAmount}
-                      </p>
-                    </div>
-                  </div>
-                )) : <h1>No orders to show</h1>}
+                  ))
+                ) : (
+                  <h1>No orders to show</h1>
+                )}
               </>
             )}
           </div>
