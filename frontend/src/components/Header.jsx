@@ -6,7 +6,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import CartDrawer from "./CartDrawer";
 import { fetchCart } from "../slices/cartSlice";
 import socket from "../socket/socket";
-import debounce from "../utility/utility";
+import { debounce } from "../utility/utility";
 
 const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
@@ -47,7 +47,8 @@ const Header = () => {
   const hideSearch =
     location.pathname.startsWith("/products/") ||
     location.pathname === "/profile" ||
-    location.pathname === "/checkout";
+    location.pathname === "/checkout" ||
+    location.pathname === "/";
 
   const handleLogOut = async () => {
     const result = await dispatch(logoutUser());
@@ -55,7 +56,7 @@ const Header = () => {
       navigate("/");
     }
   };
-  console.log(cartItems, "cartItems");
+
   return (
     <>
       <header className="w-full bg-white shadow-md p-6 flex items-center justify-between">
@@ -73,33 +74,37 @@ const Header = () => {
           )}
         </div>
 
-        <div className="flex gap-[15px]">
-          <div className="flex items-center gap-1 text-lg font-medium text-gray-800">
-            <span>Welcome,</span>
-            <span className="text-indigo-600 font-semibold">{user?.name}</span>
-          </div>
+        {!location.pathname === "/" && (
+          <div className="flex gap-[15px]">
+            <div className="flex items-center gap-1 text-lg font-medium text-gray-800">
+              <span>Welcome,</span>
+              <span className="text-indigo-600 font-semibold">
+                {user?.name}
+              </span>
+            </div>
 
-          <div className="flex items-center space-x-6 text-gray-600 text-2xl">
-            <a onClick={() => navigate("/profile")} title="Profile">
-              <FaUserCircle className="hover:text-indigo-600 cursor-pointer" />
-            </a>
-            <a
-              title="Cart"
-              onClick={() => setCartOpen(true)}
-              className="relative cursor-pointer"
-            >
-              <FaShoppingCart className="hover:text-indigo-600" />
-              {cartCount > 0 && (
-                <span className="absolute -top-3 -right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
-                  {cartCount}
-                </span>
-              )}
-            </a>
-            <a onClick={handleLogOut} title="Logout">
-              <FaSignOutAlt className="hover:text-indigo-600 cursor-pointer" />
-            </a>
+            <div className="flex items-center space-x-6 text-gray-600 text-2xl">
+              <a onClick={() => navigate("/profile")} title="Profile">
+                <FaUserCircle className="hover:text-indigo-600 cursor-pointer" />
+              </a>
+              <a
+                title="Cart"
+                onClick={() => setCartOpen(true)}
+                className="relative cursor-pointer"
+              >
+                <FaShoppingCart className="hover:text-indigo-600" />
+                {cartCount > 0 && (
+                  <span className="absolute -top-3 -right-2 bg-red-600 text-white text-xs px-1.5 py-0.5 rounded-full">
+                    {cartCount}
+                  </span>
+                )}
+              </a>
+              <a onClick={handleLogOut} title="Logout">
+                <FaSignOutAlt className="hover:text-indigo-600 cursor-pointer" />
+              </a>
+            </div>
           </div>
-        </div>
+        )}
       </header>
       {cartOpen && (
         <div

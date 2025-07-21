@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import socket from "../socket/socket";
 import { useDispatch } from "react-redux";
 import { updateCart, addToCartThunk } from "../slices/cartSlice";
 import { shallowEqual } from "react-redux";
+import { throttle } from "../utility/utility";
 
 const ProductCard = ({ product }) => {
   const [quantity, setQuantity] = useState(0);
@@ -34,8 +35,9 @@ const ProductCard = ({ product }) => {
     }
   }, [cartItems, product._id]);
 
-  const updateInCartAPI = async (qty = 1) => {
-    try {
+  const throttledUpdateCart = useMemo(() => {
+    return throttle((qty = 1) => {
+      try {
       dispatch(updateCart({ productId: product._id, quantity: qty }));
       // Emit socket event
       if (user?._id) {
@@ -50,7 +52,8 @@ const ProductCard = ({ product }) => {
     } catch (err) {
       console.error("Failed to add to cart", err);
     }
-  };
+    }, 1000) // 1 second throttle
+  }, [dispatch, user?._id, product])
 
   const handleAdd = async (e) => {
     try {
@@ -76,19 +79,19 @@ const ProductCard = ({ product }) => {
     e.stopPropagation();
     const newQty = quantity + 1;
     setQuantity(newQty);
-    await updateInCartAPI(newQty);
+    await throttledUpdateCart(newQty);
   };
 
   const decrement = async (e) => {
     e.stopPropagation();
     if (quantity === 1) {
       setQuantity(0);
-      await updateInCartAPI(0);
+      await throttledUpdateCart(0);
       return;
     }
     const newQty = quantity - 1;
     setQuantity(newQty);
-    await updateInCartAPI(newQty);
+    await throttledUpdateCart(newQty);
   };
   return (
     <div
