@@ -19,6 +19,7 @@ function App() {
   const CheckoutPage = lazy(() => import("./pages/CheckoutPage"));
   const PageNotFound = lazy(() => import("./pages/PageNotFound"));
   const Header = lazy(() => import("./components/Header"));
+  const SearchPage = lazy(() => import("./pages/SearchPage"));
 
   useEffect(() => {
     if (!profileLoaded && !user) {
@@ -38,7 +39,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <SocketJoiner />
-                  {/* <Header /> */}
                   <Home />
                 </PrivateRoute>
               }
@@ -48,7 +48,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <SocketJoiner />
-                  {/* <Header /> */}
                   <ProductDetail />
                 </PrivateRoute>
               }
@@ -58,7 +57,6 @@ function App() {
               element={
                 <PrivateRoute>
                   <SocketJoiner />
-                  {/* <Header /> */}
                   <MyProfile />
                 </PrivateRoute>
               }
@@ -68,8 +66,15 @@ function App() {
               element={
                 <PrivateRoute>
                   <SocketJoiner />
-                  {/* <Header /> */}
                   <CheckoutPage />
+                </PrivateRoute>
+              }
+            />
+            <Route
+              path="/search"
+              element={
+                <PrivateRoute>
+                  <SearchPage />
                 </PrivateRoute>
               }
             />

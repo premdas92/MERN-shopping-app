@@ -7,6 +7,7 @@ import CartDrawer from "./CartDrawer";
 import { fetchCart } from "../slices/cartSlice";
 import socket from "../socket/socket";
 import { debounce } from "../utility/utility";
+import { setQuery } from "../slices/searchSlice";
 
 const Header = () => {
   const [cartOpen, setCartOpen] = useState(false);
@@ -69,7 +70,19 @@ const Header = () => {
             <input
               type="text"
               placeholder="Search for products..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+              onFocus={() => {
+                if (location.pathname !== "/search") {
+                  navigate("/search");
+                }
+              }}
+              onChange={(e) => {
+                const q = e.target.value;
+                dispatch(setQuery(q));
+                if (location.pathname !== "/search") {
+                  navigate("/search");
+                }
+              }}
             />
           )}
         </div>

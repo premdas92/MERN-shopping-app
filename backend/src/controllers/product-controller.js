@@ -111,6 +111,22 @@ const deleteProduct = async (req, res) => {
   }
 };
 
+const searchProducts = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const regex = new RegExp(q, "i");
+    if (!q) return res.status(400).json({ error: "Query required" });
+
+    const products = await Products.find({
+      $or: [{ name: regex }, { category: regex }],
+    }).limit(20);
+
+    res.status(200).json({ data: products });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
 module.exports = {
   createproduct,
   getAllProducts,
@@ -118,4 +134,5 @@ module.exports = {
   getAllProductsByCategory,
   updateProductDetails,
   deleteProduct,
+  searchProducts,
 };

@@ -63,7 +63,7 @@ const initialState = {
   loading: false,
   error: null,
   profileLoaded: false,
-    profileLoading: false,
+  profileLoading: false,
 };
 
 const authSlice = createSlice({
@@ -80,6 +80,7 @@ const authSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
+        state.profileLoaded = true;
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
@@ -87,19 +88,19 @@ const authSlice = createSlice({
       })
       // PROFILE FETCH
       .addCase(getUserProfile.pending, (state) => {
-        state.profileLoading  = true;
+        state.profileLoading = true;
         state.error = null;
       })
       .addCase(getUserProfile.fulfilled, (state, action) => {
-        state.profileLoading  = false;
+        state.profileLoading = false;
         state.user = action.payload;
         state.profileLoaded = true;
       })
       .addCase(getUserProfile.rejected, (state, action) => {
-        state.profileLoading  = false;
+        state.profileLoading = false;
         state.error = action.payload;
         state.profileLoaded = true;
-         state.user = null;
+        state.user = null;
       })
       // LOGOUT
       .addCase(logoutUser.fulfilled, (state) => {
