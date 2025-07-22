@@ -74,7 +74,7 @@ const Header = () => {
           )}
         </div>
 
-        {!location.pathname === "/" && (
+        {user?.name && (
           <div className="flex gap-[15px]">
             <div className="flex items-center gap-1 text-lg font-medium text-gray-800">
               <span>Welcome,</span>
