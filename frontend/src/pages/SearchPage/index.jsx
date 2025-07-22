@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { debounce } from "../../utility/utility";
 import { searchProducts } from "../../api/searchApi";
 import { useSelector } from "react-redux";
@@ -7,7 +6,6 @@ import ProductList from "../../components/ProductList";
 
 const SearchPage = () => {
   const [results, setResults] = useState([]);
-  const navigate = useNavigate();
   const query = useSelector((state) => state.search.query);
 
   const debouncedSearch = useMemo(
