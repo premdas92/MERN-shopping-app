@@ -5,7 +5,7 @@ const userAuth = async (req, res, next) => {
   try {
     const { accessToken } = req.cookies;
     if (!accessToken) {
-      return res.status(401).json({ error: "You have to login first" });
+      return res.status(401);
     }
     const decodedObj = await jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
     const { _id } = decodedObj;
