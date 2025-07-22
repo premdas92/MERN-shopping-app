@@ -1,5 +1,5 @@
 import "./App.css";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import PrivateRoute from "./components/PrivateRoute";
 import SocketJoiner from "./socket/socket-joiner";
 import { useDispatch } from "react-redux";
@@ -28,7 +28,6 @@ function App() {
   }, [dispatch, profileLoaded, user]);
   return (
     <div className="min-h-screen bg-gray-100">
-      <BrowserRouter>
         <Suspense fallback={<div className="p-4">Loading...</div>}>
           <Header />
           <Routes>
@@ -74,6 +73,7 @@ function App() {
               path="/search"
               element={
                 <PrivateRoute>
+                  <SocketJoiner />
                   <SearchPage />
                 </PrivateRoute>
               }
@@ -81,7 +81,6 @@ function App() {
             <Route path="*" element={<PageNotFound />} />
           </Routes>
         </Suspense>
-      </BrowserRouter>
     </div>
   );
 }
