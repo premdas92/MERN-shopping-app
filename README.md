@@ -108,12 +108,20 @@ In the root folder where you ran the command to install the dependencies, run an
 npm run dev
 ```
 
+This command will run both the frontend and the backend server
+Frontend will be available at http://localhost:5173
+Backend will be available at http://localhost:3000
+
+## ⚙️ Future Enhancements
+- ✅ Toast notifications instead of alerts
+- 🧾 Order history page
+- 💳 Payment gateway integration
+- 🛡️ Admin panel
+- 🧪 Unit + Integration tests
 
 
-
-
-
-
+## 👨‍💻 Author
+**Developed with ❤️ by Prem**
 
 
 
