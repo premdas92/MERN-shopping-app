@@ -6,18 +6,15 @@ import ProductList from "../../components/ProductList";
 import { productCategories } from "../../constants/product-categories";
 
 const Home = () => {
-  const [selectedCategory, setSelectCategory] = useState(productCategories[0].name);
+  const [selectedCategory, setSelectCategory] = useState(
+    productCategories[0].name
+  );
 
   const dispatch = useDispatch();
-  //   const { user } = useSelector((state) => state.auth);
-  const {
-    data: products,
-    loading
-  } = useSelector((state) => state.products);
+  const { data: products, loading } = useSelector((state) => state.products);
 
   useEffect(() => {
     dispatch(getProducts({ category: selectedCategory }));
-    // dispatch(getProducts("fruits"))
   }, [dispatch, selectedCategory]);
 
   return (
@@ -39,7 +36,7 @@ const Home = () => {
                     onClick={() => setSelectCategory(data.name)}
                   >
                     <span className="inline-block h-12 w-12 rounded-full bg-[#F7F0FA]">
-                      <img src={data.img} alt="category-img" />
+                      <img src={data.img} alt={`category-img-${data.name}`} />
                     </span>
                     <p>{data.name}</p>
                   </li>

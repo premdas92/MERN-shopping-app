@@ -6,17 +6,17 @@
 - POST /api/auth/logout
 *** Admin Dashboard
 
-## Product Routes (No Auth)
+## Product Routes
 - GET /api/products -> Get All products
 - GET /api/products/:id -> Get particular product
 - GET /api/products?page=1
 
-## Product Routes (With Auth)
+## Product Routes
 - Admin - POST /api/products -> Create a product
 - Admin - PATCH /api/products/:id -> Update a product
 - Admin - DELETE /api/products/:id -> Delete a product
 
-## Cart Routes (With Auth)
+## Cart Routes
 - GET /api/user/cart -> Get current user's cart
 - POST /api/user/cart -> Add to cart
 - PATCH /api/user/cart/:productId -> Update product qty in cart

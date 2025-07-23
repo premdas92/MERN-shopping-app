@@ -65,25 +65,30 @@ const Header = () => {
           <a href="/">FreshO</a>
         </div>
 
-        <div className="flex-1 mx-6 max-w-2xl">
+        <div className="flex-1 mx-6 max-w-2xl" role="search">
           {!hideSearch && (
-            <input
-              type="text"
-              placeholder="Search for products..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
-              onFocus={() => {
-                if (location.pathname !== "/search") {
-                  navigate("/search");
-                }
-              }}
-              onChange={(e) => {
-                const q = e.target.value;
-                dispatch(setQuery(q));
-                if (location.pathname !== "/search") {
-                  navigate("/search");
-                }
-              }}
-            />
+            <>
+              <input
+                id="search-input"
+                name="search"
+                type="text"
+                aria-label="Search products"
+                placeholder="Search for products..."
+                className="w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer"
+                onFocus={() => {
+                  if (location.pathname !== "/search") {
+                    navigate("/search");
+                  }
+                }}
+                onChange={(e) => {
+                  const q = e.target.value;
+                  dispatch(setQuery(q));
+                  if (location.pathname !== "/search") {
+                    navigate("/search");
+                  }
+                }}
+              />
+            </>
           )}
         </div>
 

@@ -101,10 +101,10 @@ const ProductCard = ({ product }) => {
     >
       <img
         src={product.image}
-        alt={product.name}
+         alt={`Photo of ${product.name}`}
         className="h-40 object-cover w-full rounded"
       />
-      <h3 className="mt-2 font-semibold">{product.name}</h3>
+      <p className="mt-2 font-semibold">{product.name}</p>
       <p className="text-sm text-gray-500">
         {product.weight
           ? `${product.weight}${product.unit}`
